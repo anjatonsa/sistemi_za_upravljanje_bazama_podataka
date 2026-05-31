@@ -1,0 +1,61 @@
+services:
+
+  keeper-01:
+    image: clickhouse/clickhouse-server:24.3
+    container_name: keeper-01
+    hostname: keeper-01
+    volumes:
+      - ./config/keeper/keeper-01.xml:/etc/clickhouse-server/config.d/keeper.xml
+    networks: [ch-net]
+
+  keeper-02:
+    image: clickhouse/clickhouse-server:24.3
+    container_name: keeper-02
+    hostname: keeper-02
+    volumes:
+      - ./config/keeper/keeper-02.xml:/etc/clickhouse-server/config.d/keeper.xml
+    networks: [ch-net]
+
+  keeper-03:
+    image: clickhouse/clickhouse-server:24.3
+    container_name: keeper-03
+    hostname: keeper-03
+    volumes:
+      - ./config/keeper/keeper-03.xml:/etc/clickhouse-server/config.d/keeper.xml
+    networks: [ch-net]
+
+  clickhouse-01:
+    image: clickhouse/clickhouse-server:24.3
+    container_name: clickhouse-01
+    hostname: clickhouse-01
+    ports: ["9001:9000", "8124:8123"]
+    volumes:
+      - ./config/clickhouse/node-01.xml:/etc/clickhouse-server/config.d/cluster.xml
+    depends_on: [keeper-01, keeper-02, keeper-03]
+    networks: [ch-net]
+
+  clickhouse-02:
+    image: clickhouse/clickhouse-server:24.3
+    container_name: clickhouse-02
+    hostname: clickhouse-02
+    ports: ["9002:9000", "8125:8123"]
+    volumes:
+      - ./config/clickhouse/node-02.xml:/etc/clickhouse-server/config.d/cluster.xml
+    depends_on: [keeper-01, keeper-02, keeper-03]
+    networks: [ch-net]
+
+  clickhouse-03:
+    image: clickhouse/clickhouse-server:24.3
+    container_name: clickhouse-03
+    hostname: clickhouse-03
+    ports: ["9003:9000", "8126:8123"]
+    volumes:
+      - ./config/clickhouse/node-03.xml:/etc/clickhouse-server/config.d/cluster.xml
+    depends_on: [keeper-01, keeper-02, keeper-03]
+    networks: [ch-net]
+
+networks:
+  ch-net:
+    driver: bridge
+
+
